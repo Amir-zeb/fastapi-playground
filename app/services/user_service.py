@@ -24,7 +24,6 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
         return None
 
     update_data = user.model_dump(exclude_unset=True,exclude_none=True)
-    print("🚀 ~ update_user ~ update_data:", update_data)
 
     for key, value in update_data.items():
         setattr(db_user, key, value)
