@@ -15,10 +15,8 @@ class RegisterData(BaseModel):
 class AuthenticatedUser(UserBase):
     id: int
 
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    user: AuthenticatedUser
+class LoginResponse(AuthenticatedUser):
+    pass
 
 class RegisterResponse(BaseModel):
     pass
