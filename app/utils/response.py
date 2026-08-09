@@ -10,4 +10,3 @@ def success_response(message: str, data=None, status_code=status.HTTP_200_OK):
         "message": message,
         "data": data,
     }
-    

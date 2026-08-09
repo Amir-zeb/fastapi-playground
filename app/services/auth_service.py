@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
 from app.models.user import UserModel
 from app.schema.auth import RegisterData
-from app.exceptions import EmailAlreadyExistsError, InvalidCredentialsError
+from app.exceptions import EmailAlreadyExistsError, InvalidCredentialsError, UserNotFound
 from app.utils.password import hash_password, verify_password
 from app.utils.jwt import create_access_token
+from app.services.user_service import get_user_by_id
+from typing import Union
 
 def login(db: Session, email: str, password: str):
     user = db.query(UserModel).filter(UserModel.email == email).first()
@@ -21,8 +23,8 @@ def login(db: Session, email: str, password: str):
     raise InvalidCredentialsError()
 
 def register(db: Session, data:RegisterData):
-    is_exists = existing_user(db, data.email)
-    if is_exists:
+    user_found = get_user_be_email(db, data.email)
+    if user_found:
         raise EmailAlreadyExistsError()
     
     user_data = data.model_dump()
@@ -36,5 +38,12 @@ def register(db: Session, data:RegisterData):
     
     return db_user
 
-def existing_user(db: Session, email: str):
+def get_user(db: Session,payload):
+    user_id=int(payload["sub"])
+    user= get_user_by_id(db, user_id)
+    if not user:
+        raise UserNotFound()
+    return user
+
+def get_user_be_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()

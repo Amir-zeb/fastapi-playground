@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
-from app.dependencies import get_db
-from app.schema.auth import LoginCredentials, RegisterData, RegisterResponse, LoginResponse
-from app.services.auth_service import login, register
+from app.dependencies import get_db, authentication
+from app.schema.auth import LoginCredentials, RegisterData, RegisterResponse, LoginResponse, AuthenticatedUser
+from app.services.auth_service import login, register, get_user
 from app.utils.response import success_response
 from app.schema.api_response import ApiResponse
 
@@ -55,10 +55,32 @@ def register_endpoint(register_data: RegisterData, db=Depends(get_db)):
         status_code=status.HTTP_201_CREATED,
     )
 
-@router.post("/logout", summary="Logout Endpoint", description="Handles user logout.")
-def logout():   
-    return {"message": "Logout endpoint"}
+@router.post(
+    "/logout",
+    summary="Logout Endpoint",
+    description="Handles user logout.",
+    response_model=ApiResponse
+)
+def logout(response:Response,payload=Depends(authentication)):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=False,  # True in production
+        samesite="lax",
+    )   
+    return success_response(
+        "User logout."
+    )
 
-@router.get("/me", summary="User Information Endpoint", description="Retrieves authenticated user information.")
-def me():
-    return {"message": "Authenticated user information"}
+@router.get(
+    "/me",
+    summary="User Information Endpoint",
+    description="Retrieves authenticated user information.",
+    response_model=ApiResponse[AuthenticatedUser]
+)
+def me(db=Depends(get_db),payload=Depends(authentication)):
+    user=get_user(db, payload)
+    return success_response(
+        "User details.",
+        user
+    )

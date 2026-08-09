@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.routes.user import router as user_router
@@ -18,6 +18,7 @@ async def app_exception_handler(request: Request, exc: AppException):
         content={
             "status": exc.status,
             "message": exc.detail,
+            "code": exc.code,
         },
     )
 
@@ -48,20 +49,6 @@ async def internal_server_error_handler(
             "detail": None,
         },
     )
-
-# @app.exception_handler(HTTPException)
-# async def http_exception_handler(
-#     request: Request,
-#     exc: HTTPException,
-# ):
-#     return JSONResponse(
-#         status_code=exc.status_code,
-#         content={
-#             "status": exc.status_code,
-#             "message": exc.detail,
-#             "detail": None,
-#         },
-#     )
 
 app.include_router(auth_router)
 app.include_router(user_router)
