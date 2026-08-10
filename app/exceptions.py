@@ -1,8 +1,7 @@
 from fastapi import status
 
-
 class AppException(Exception):
-    def __init__(self, detail: str, code: str, status: int):
+    def __init__(self, detail: str, code: str, status: int)-> None :
         self.detail = detail
         self.code = code
         self.status = status
@@ -10,7 +9,7 @@ class AppException(Exception):
 
 
 class EmailAlreadyExistsError(AppException):
-    def __init__(self):
+    def __init__(self)-> None   :
         super().__init__(
             detail="Email already registered",
             status=status.HTTP_409_CONFLICT,
@@ -19,7 +18,7 @@ class EmailAlreadyExistsError(AppException):
 
 
 class PasswordDoesNotMatchError(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="Password does not match",
             status=status.HTTP_401_UNAUTHORIZED,
@@ -28,7 +27,7 @@ class PasswordDoesNotMatchError(AppException):
 
 
 class InvalidCredentialsError(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="Invalid email or password",
             status=status.HTTP_401_UNAUTHORIZED,
@@ -37,7 +36,7 @@ class InvalidCredentialsError(AppException):
 
 
 class InvalidTokenError(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="Invalid token",
             status=status.HTTP_401_UNAUTHORIZED,
@@ -46,7 +45,7 @@ class InvalidTokenError(AppException):
 
 
 class TokenExpiredError(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="Token has expired",
             status=status.HTTP_401_UNAUTHORIZED,
@@ -55,7 +54,7 @@ class TokenExpiredError(AppException):
 
 
 class AuthRequired(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="Authentication required",
             status=status.HTTP_401_UNAUTHORIZED,
@@ -63,7 +62,7 @@ class AuthRequired(AppException):
         )
 
 class UserNotFound(AppException):
-    def __init__(self):
+    def __init__(self)-> None :
         super().__init__(
             detail="User not found",
             status=status.HTTP_404_NOT_FOUND,

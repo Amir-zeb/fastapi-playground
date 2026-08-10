@@ -12,7 +12,7 @@ Base.metadata.create_all(bind=engine)
 app=FastAPI(title="FastAPI Playground", description="This is a simple FastAPI application.", version="1.0.0")
 
 @app.exception_handler(AppException)
-async def app_exception_handler(request: Request, exc: AppException):
+async def app_exception_handler(request: Request, exc: AppException)-> JSONResponse:
     return JSONResponse(
         status_code=exc.status,
         content={
@@ -26,7 +26,7 @@ async def app_exception_handler(request: Request, exc: AppException):
 async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
-):
+)-> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
@@ -40,7 +40,7 @@ async def validation_exception_handler(
 async def internal_server_error_handler(
     request: Request,
     exc: Exception,
-):
+)-> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -54,5 +54,5 @@ app.include_router(auth_router)
 app.include_router(user_router)
 
 @app.get("/health", tags=["Health Check"], summary="Health Check Endpoint", description="Returns a simple message indicating that the application is running.")
-def root():
+def root()->dict:
     return {"message": "Hello, World!"}

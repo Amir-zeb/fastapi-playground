@@ -1,10 +1,11 @@
-from app.database import SessionLocal
 from fastapi import Request
+from app.database import SessionLocal
 from app.exceptions import AuthRequired
 from app.utils.jwt import verify_token
-from typing import Union
+from typing import Generator
+from sqlalchemy.orm import Session
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
 
     try:
@@ -12,7 +13,7 @@ def get_db():
     finally:
         db.close()
 
-def authentication(request: Request)->dict[str:Union[str,int]]:
+def authentication(request: Request) -> dict:
     token = request.cookies.get("access_token")
     if not token:
         raise AuthRequired()

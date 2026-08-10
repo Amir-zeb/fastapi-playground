@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Response, status
+from sqlalchemy.orm import Session
 from app.dependencies import get_db, authentication
 from app.schema.auth import LoginCredentials, RegisterData, RegisterResponse, LoginResponse, AuthenticatedUser
 from app.services.auth_service import login, register, get_user
@@ -24,7 +25,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
         }
     },
 )
-def login_endpoint(credentials: LoginCredentials, response: Response, db=Depends(get_db)):
+def login_endpoint(credentials: LoginCredentials, response: Response, db: Session=Depends(get_db))->dict:
     user, token = login(db, credentials.email, credentials.password)
 
     response.set_cookie(
@@ -48,7 +49,7 @@ def login_endpoint(credentials: LoginCredentials, response: Response, db=Depends
     status_code=status.HTTP_201_CREATED,
     response_model=ApiResponse[RegisterResponse],
 )
-def register_endpoint(register_data: RegisterData, db=Depends(get_db)):
+def register_endpoint(register_data: RegisterData, db: Session=Depends(get_db))->dict:
     register(db, register_data)
     return success_response(
         "user registered successfully",
@@ -61,7 +62,7 @@ def register_endpoint(register_data: RegisterData, db=Depends(get_db)):
     description="Handles user logout.",
     response_model=ApiResponse
 )
-def logout(response:Response,payload=Depends(authentication)):
+def logout(response:Response,payload:dict=Depends(authentication))->dict:
     response.delete_cookie(
         key="access_token",
         httponly=True,
@@ -78,7 +79,7 @@ def logout(response:Response,payload=Depends(authentication)):
     description="Retrieves authenticated user information.",
     response_model=ApiResponse[AuthenticatedUser]
 )
-def me(db=Depends(get_db),payload=Depends(authentication)):
+def me(db: Session=Depends(get_db),payload:dict=Depends(authentication))->dict:
     user=get_user(db, payload)
     return success_response(
         "User details.",

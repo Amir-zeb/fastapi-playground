@@ -4,25 +4,17 @@ from app.schema.auth import RegisterData
 from app.exceptions import EmailAlreadyExistsError, InvalidCredentialsError, UserNotFound
 from app.utils.password import hash_password, verify_password
 from app.utils.jwt import create_access_token
-from app.services.user_service import get_user_by_id
-from typing import Union
+from app.services.user_service import get_user_be_email
 
-def login(db: Session, email: str, password: str):
+def login(db: Session, email: str, password: str)-> tuple[UserModel,str]:
     user = db.query(UserModel).filter(UserModel.email == email).first()
     if user and verify_password(password, user.password):
         token = create_access_token(user.id)
-        return {
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
-            "age": user.age,
-            "gender": user.gender,
-        }, token
-        # return user, token
+        return user, token
 
     raise InvalidCredentialsError()
 
-def register(db: Session, data:RegisterData):
+def register(db: Session, data:RegisterData)->UserModel:
     user_found = get_user_be_email(db, data.email)
     if user_found:
         raise EmailAlreadyExistsError()
@@ -38,12 +30,12 @@ def register(db: Session, data:RegisterData):
     
     return db_user
 
-def get_user(db: Session,payload):
+def get_user(db: Session,payload:dict)->UserModel:
     user_id=int(payload["sub"])
     user= get_user_by_id(db, user_id)
     if not user:
         raise UserNotFound()
     return user
 
-def get_user_be_email(db: Session, email: str):
-    return db.query(UserModel).filter(UserModel.email == email).first()
+def get_user_by_id(db: Session, user_id: int)-> UserModel|None:
+    return db.query(UserModel).filter(UserModel.id == user_id).first()
