@@ -13,3 +13,4 @@ class UserModel(Base):
     password: Mapped[str] = mapped_column(String)
     age: Mapped[int] = mapped_column(Integer)
     gender: Mapped[str] = mapped_column(String)
+    role: Mapped[str] = mapped_column(String, default="user")

@@ -39,3 +39,7 @@ def get_user(db: Session,payload:dict)->UserModel:
 
 def get_user_by_id(db: Session, user_id: int)-> UserModel|None:
     return db.query(UserModel).filter(UserModel.id == user_id).first()
+
+def check_role(db: Session, user_id: int)-> str | None:
+    result = db.query(UserModel.role).filter(UserModel.id == user_id).first()
+    return result[0] if result else None

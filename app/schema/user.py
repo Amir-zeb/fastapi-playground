@@ -5,6 +5,10 @@ from pydantic import BaseModel, Field, EmailStr
 class Gender(str, Enum):
     MALE = "male"
     FEMALE = "female"
+    
+class RoleEnum(str, Enum):
+    USER = "user"
+    ADMIN = "admin"
 
 
 class UserBase(BaseModel):
@@ -13,6 +17,7 @@ class UserBase(BaseModel):
     email: str
     age: int
     gender: Gender
+    role: RoleEnum
     
 class User(UserBase):
     id: int

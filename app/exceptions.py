@@ -7,7 +7,6 @@ class AppException(Exception):
         self.status = status
         super().__init__(detail)
 
-
 class EmailAlreadyExistsError(AppException):
     def __init__(self)-> None   :
         super().__init__(
@@ -15,7 +14,6 @@ class EmailAlreadyExistsError(AppException):
             status=status.HTTP_409_CONFLICT,
             code="EMAIL_ALREADY_EXISTS",
         )
-
 
 class PasswordDoesNotMatchError(AppException):
     def __init__(self)-> None :
@@ -25,7 +23,6 @@ class PasswordDoesNotMatchError(AppException):
             code="PASSWORD_DOES_NOT_MATCH",
         )
 
-
 class InvalidCredentialsError(AppException):
     def __init__(self)-> None :
         super().__init__(
@@ -33,7 +30,6 @@ class InvalidCredentialsError(AppException):
             status=status.HTTP_401_UNAUTHORIZED,
             code="INVALID_CREDENTIALS",
         )
-
 
 class InvalidTokenError(AppException):
     def __init__(self)-> None :
@@ -43,7 +39,6 @@ class InvalidTokenError(AppException):
             code="INVALID_TOKEN",
         )
 
-
 class TokenExpiredError(AppException):
     def __init__(self)-> None :
         super().__init__(
@@ -51,7 +46,6 @@ class TokenExpiredError(AppException):
             status=status.HTTP_401_UNAUTHORIZED,
             code="TOKEN_EXPIRED",
         )
-
 
 class AuthRequired(AppException):
     def __init__(self)-> None :
@@ -67,4 +61,12 @@ class UserNotFound(AppException):
             detail="User not found",
             status=status.HTTP_404_NOT_FOUND,
             code="USER_NOT_FOUND",
+        )
+
+class Forbidden(AppException):
+    def __init__(self)-> None :
+        super().__init__(
+            detail="Authorization required.",
+            status=status.HTTP_403_FORBIDDEN,
+            code="FORBIDDEN",
         )
