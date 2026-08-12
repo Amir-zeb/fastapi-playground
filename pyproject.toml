@@ -25,6 +25,7 @@ package = false
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.10.0",
     "mypy>=2.3.0",
     "pytest>=9.1.1",
 ]
@@ -36,3 +37,7 @@ disallow_untyped_defs = true
 ignore_missing_imports = true
 warn_unused_ignores = true
 warn_return_any = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

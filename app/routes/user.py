@@ -9,7 +9,7 @@ from app.utils.response import success_response
 router = APIRouter(prefix="/user", tags=["User"], dependencies=[Depends(authentication),Depends(authorized({"admin"}))])
 
 @router.post(
-    "/",
+    "/create",
     summary="Create User Endpoint",
     description="Creates a new user and adds it to the user list.",
     status_code=status.HTTP_201_CREATED,
@@ -18,7 +18,6 @@ router = APIRouter(prefix="/user", tags=["User"], dependencies=[Depends(authenti
 def create_user_endpoint(user_data: UserCreate, db: Session = Depends(get_db))->dict:
     db_user = create_user(db, user_data)
     return success_response("User created successfully", db_user, status_code=status.HTTP_201_CREATED)
-
 
 @router.get("/all", summary="User Endpoint", description="Returns user information.",response_model=ApiResponse[list[User]])
 def get_user_all_endpoint(db:Session=Depends(get_db))->dict:
