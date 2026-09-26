@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
-from app.dependencies import get_db, authentication
+from app.dependencies import get_db, authentication, rate_limit
 from app.schema.auth import LoginCredentials, RegisterData, RegisterResponse, LoginResponse, AuthenticatedUser
 from app.services.auth_service import login, register, get_user
 from app.utils.response import success_response
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
         }
     },
 )
-def login_endpoint(credentials: LoginCredentials, response: Response, db: Session=Depends(get_db))->dict:
+def login_endpoint(credentials: LoginCredentials, response: Response, db: Session=Depends(get_db),_:None=Depends(rate_limit("login",max_requests=5, window_seconds=60)))->dict:
     user, token = login(db, credentials.email, credentials.password)
 
     response.set_cookie(

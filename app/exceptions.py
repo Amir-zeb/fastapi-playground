@@ -70,3 +70,11 @@ class Forbidden(AppException):
             status=status.HTTP_403_FORBIDDEN,
             code="FORBIDDEN",
         )
+
+class TooManyRequests(AppException):
+    def __init__(self) -> None:
+        super().__init__(
+            detail="Too many requests, please try again later",
+            status=status.HTTP_429_TOO_MANY_REQUESTS,
+            code="TOO_MANY_REQUESTS",
+        )

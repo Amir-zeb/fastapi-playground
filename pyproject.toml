@@ -28,6 +28,7 @@ dev = [
     "httpx2>=2.10.0",
     "mypy>=2.3.0",
     "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.mypy]
@@ -41,3 +42,4 @@ warn_return_any = true
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing"
