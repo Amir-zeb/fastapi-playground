@@ -9,6 +9,14 @@ import unittest
 from app.utils.password import hash_password, verify_password
 
 
+# NOTE : In case class-based unit test is used in project. thats are fixture is injected in class.
+# Even in class-based unittest.TestCase style, you could technically pull in a pytest fixture like db_session 
+# — but it requires extra glue, since TestCase.setUp can't directly accept fixture parameters 
+# the way a plain pytest function can. You'd need something like:
+# @pytest.fixture(autouse=True)
+# def _inject_db(self, db_session):
+#     self.db = db_session
+
 class PasswordHashingTests(unittest.TestCase):
     def setUp(self) -> None:
         # unittest.TestCase equivalent of a pytest fixture — but this runs
