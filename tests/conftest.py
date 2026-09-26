@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 from uuid import uuid4
+from typing import Generator,Any, cast
 
 from main import app
 from app.dependencies import get_db
@@ -27,7 +28,7 @@ engine = create_engine(
 TestSessionLocal = sessionmaker(bind=engine)
 
 
-def override_get_db():
+def override_get_db()-> Generator[Session, None, None]:
     db = TestSessionLocal()
     try:
         yield db
@@ -36,7 +37,7 @@ def override_get_db():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def create_test_db():
+def create_test_db()-> Generator[None, None, None]:
     """Create all tables once before any test runs, drop them after the whole session."""
     Base.metadata.create_all(bind=engine)
     yield
@@ -44,14 +45,14 @@ def create_test_db():
 
 
 @pytest.fixture()
-def client():
+def client()-> Generator[TestClient, None, None]:
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
 
 @pytest.fixture()
-def db_session():
+def db_session()-> Generator[Session, None, None]:
     """A raw DB session against the same test engine the client fixture uses."""
     db = TestSessionLocal()
     try:
@@ -88,7 +89,7 @@ def admin_user(client: TestClient, db_session: Session) -> dict:
     response = client.post("/auth/register", json=payload)
     assert response.status_code == 201
 
-    user = db_session.query(UserModel).filter(UserModel.email == payload["email"]).first()
+    user:Any = db_session.query(UserModel).filter(UserModel.email == payload["email"]).first()
     user.role = "admin"
     db_session.commit()
 
@@ -148,6 +149,6 @@ def seeded_users(client: TestClient) -> list[dict]:
 @pytest.fixture()
 def db_users(logged_in_admin:TestClient,seeded_users: list[dict]) -> list[dict]:
     response = logged_in_admin.get("/user/all")
-    data=response.json()
+    data = response.json()
     assert response.status_code == 200
-    return data["data"]
+    return  cast(list[dict], data["data"])
