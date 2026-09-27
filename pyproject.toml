@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "aiosqlite>=0.22.1",
     "email-validator>=2.3.0",
     "fastapi>=0.141.1",
     "pwdlib[argon2]>=0.3.0",
@@ -28,6 +29,7 @@ dev = [
     "httpx2>=2.10.0",
     "mypy>=2.3.0",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
 ]
 
@@ -42,4 +44,5 @@ warn_return_any = true
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+asyncio_mode = "auto"
 addopts = "--cov=app --cov-report=term-missing"

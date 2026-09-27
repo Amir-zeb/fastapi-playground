@@ -1,3 +1,5 @@
+from typing import AsyncIterator
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -7,8 +9,12 @@ from app.models.user import Base
 from app.database import engine
 from app.exceptions import AppException
 
-Base.metadata.create_all(bind=engine)
-
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    
 app=FastAPI(title="FastAPI Playground", description="This is a simple FastAPI application.", version="1.0.0")
 
 @app.exception_handler(AppException)

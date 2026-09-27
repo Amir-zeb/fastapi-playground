@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Response, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.dependencies import get_db, authentication, rate_limit
 from app.schema.auth import LoginCredentials, RegisterData, RegisterResponse, LoginResponse, AuthenticatedUser
 from app.services.auth_service import login, register, get_user
@@ -25,8 +25,13 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
         }
     },
 )
-def login_endpoint(credentials: LoginCredentials, response: Response, db: Session=Depends(get_db),_:None=Depends(rate_limit("login",max_requests=5, window_seconds=60)))->dict:
-    user, token = login(db, credentials.email, credentials.password)
+async def login_endpoint(
+    credentials: LoginCredentials,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+    _: None = Depends(rate_limit("login", max_requests=5, window_seconds=60)),
+) -> dict:
+    user, token = await login(db, credentials.email, credentials.password)
 
     response.set_cookie(
         key="access_token",
@@ -36,7 +41,7 @@ def login_endpoint(credentials: LoginCredentials, response: Response, db: Sessio
         samesite="lax",
         max_age=3600,
     )
-    
+
     return success_response(
         "user logged in successfully",
         user,
@@ -49,8 +54,8 @@ def login_endpoint(credentials: LoginCredentials, response: Response, db: Sessio
     status_code=status.HTTP_201_CREATED,
     response_model=ApiResponse[RegisterResponse],
 )
-def register_endpoint(register_data: RegisterData, db: Session=Depends(get_db))->dict:
-    register(db, register_data)
+async def register_endpoint(register_data: RegisterData, db: AsyncSession = Depends(get_db)) -> dict:
+    await register(db, register_data)
     return success_response(
         "user registered successfully",
         status_code=status.HTTP_201_CREATED,
@@ -62,13 +67,13 @@ def register_endpoint(register_data: RegisterData, db: Session=Depends(get_db))-
     description="Handles user logout.",
     response_model=ApiResponse
 )
-def logout(response:Response,payload:dict=Depends(authentication))->dict:
+def logout(response: Response, payload: dict = Depends(authentication)) -> dict:
     response.delete_cookie(
         key="access_token",
         httponly=True,
         secure=False,  # True in production
         samesite="lax",
-    )   
+    )
     return success_response(
         "User logout."
     )
@@ -79,8 +84,8 @@ def logout(response:Response,payload:dict=Depends(authentication))->dict:
     description="Retrieves authenticated user information.",
     response_model=ApiResponse[AuthenticatedUser]
 )
-def me(db: Session=Depends(get_db),payload:dict=Depends(authentication))->dict:
-    user=get_user(db, payload)
+async def me(db: AsyncSession = Depends(get_db), payload: dict = Depends(authentication)) -> dict:
+    user = await get_user(db, payload)
     return success_response(
         "User details.",
         user
